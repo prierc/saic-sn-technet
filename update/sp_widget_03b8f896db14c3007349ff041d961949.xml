@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <client_script><![CDATA[function($scope, $rootScope, $timeout, spUtil) {
+	/* widget controller */
+	var c = this;
+
+	spUtil.recordWatch($scope, 'incident', 'stateNOT IN3,6,7');
+	
+	// Update the chart if Data Changes
+	$scope.$watch( "c.data.chartData",
+		function handleChartDataChange( newValue, oldValue ) {
+			if(c.myChart) {
+				c.myChart.series[0].setData(c.data.chartData, true);
+			}
+		}
+	);
+	
+	_createChart();
+	
+	function _createChart() {
+		c.myChart = new Highcharts.Chart({
+			chart: {
+				renderTo: 'myPBSLBar',
+				type: 'bar',
+				options3d: {
+					enabled: false,
+					alpha: 15,
+					beta: 15,
+					depth: 50,
+					viewDistance: 25
+				}
+			},
+			title: {
+				text: 'Incidents by Category'
+			},
+			xAxis: {
+				categories: c.data.vals.cats
+			},
+			yAxis: {
+				title: {
+					text: 'Active Incidents'
+				}
+			},
+			credits: {
+				enabled: false
+			},
+			plotOptions: {
+				series: {
+					stacking: 'normal',
+					depth:25,
+					point: {
+						events: {
+							click: function(e) {
+								var exFils = {
+									"entity": this.category,
+									"status": this.series.name,
+									"eType" : "u_lead_service_line"
+								};
+								// console.log("Clicked: "+exFils.entity+" for: "+exFils.status);
+
+								$timeout(function(){
+									$rootScope.$broadcast('setTableExFils', exFils);
+								},500);
+							}
+						}
+					}
+				}
+			},
+			series: [
+				{
+					name: 'Network',
+					color: '#428bca',
+					legendIndex: 3,
+					data:  [5, 4, 5, 3]
+				},
+				{
+					name: 'Hardware',
+					color: '#C390D4',
+					legendIndex: 2,
+					data: c.data.vals.Hardware
+				},
+				{
+					name: 'Software',
+					color: '#31708f',
+					legendIndex: 1,
+					data: c.data.vals.Software
+				}, 
+				{
+					name: 'Other',
+					color: '#90C3D4',
+					legendIndex: 0,
+					data: c.data.vals.Other
+				}
+			]
+		});
+
+	}
+	
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css/>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>true</has_preview>
+        <id/>
+        <internal>false</internal>
+        <link/>
+        <name>TN Bar Category</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+  /* populate the 'data' object */
+  /* e.g., data.table = $sp.getValue('table'); */
+	
+	// var sls = new x_saic4_kps_core.SLStats();
+	// data.vals = sls.getActiveLeadSLStats();	
+
+	data.vals = {};
+	data.vals.Network = 5;
+	data.vals.Hardware = 5;
+	data.vals.Software = 3;
+	data.vals.Other = 7;
+	data.vals.cats = ["Network", "Hardware", "Software", "Other"];
+	
+	var gra = new GlideAggregate('incident');
+	gra.addEncodedQuery('stateNOT IN3,6,7');
+	gra.addEncodedQuery('caller_id.company.name=US Army');
+	
+	gra.groupBy('category');
+	gra.addAggregate('COUNT');
+	gra.query();
+		/**
+	while(gra.next()) {
+		if (gra.category == 'Network') {
+			data.vals.Network = 1 * gra.getAggregate('COUNT');
+		} else if (gra.impact == 'Hardware') {
+			data.vals.Hardware = 1 * gra.getAggregate('COUNT');
+		} else if (gra.impact == 'Software') {
+			data.vals.Software = 1 * gra.getAggregate('COUNT');
+		} else {
+			data.vals.Other = 1 * gra.getAggregate('COUNT');
+		}
+	}	
+	**/
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-08-02 16:23:45</sys_created_on>
+        <sys_id>03b8f896db14c3007349ff041d961949</sys_id>
+        <sys_mod_count>14</sys_mod_count>
+        <sys_name>TN Bar Category</sys_name>
+        <sys_package display_value="TechNet17" source="x_snc_technet17">0c5da3a8db5803007349ff041d96194e</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="TechNet17">0c5da3a8db5803007349ff041d96194e</sys_scope>
+        <sys_update_name>sp_widget_03b8f896db14c3007349ff041d961949</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2017-08-02 16:50:15</sys_updated_on>
+        <template><![CDATA[<div>
+<div id="myPBSLBar" style="height:320px;" ></div>
+</div>]]></template>
+    </sp_widget>
+</record_update>

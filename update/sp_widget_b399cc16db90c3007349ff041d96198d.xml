@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <client_script><![CDATA[function($scope, spUtil) {
+	
+	var c = this;
+	if (!c.options.mydivid) {
+		c.options.mydivid = "myChartPri123";
+	}
+	
+	// c.data.chardiv = '<div id="'+c.options.mydivid+'" style="height:280px;" ></div>';
+	
+	spUtil.recordWatch($scope, 'incident', 'stateNOT IN6,7');
+	
+	_createChart();
+
+	// Update the chart if Data Changes
+	$scope.$watch( "c.data.chartData",
+		function handleChartDataChange( newValue, oldValue ) {
+			if(c.myChart) {
+				c.myChart.series[0].setData(c.data.chartData, true);
+				c.myChart.redraw();
+			}
+		}
+	);
+	
+	function _createChart() {
+		c.myChart = new Highcharts.Chart({
+			chart: {
+				type: 'pie',
+				renderTo: c.options.mydivid
+			},
+			title: {
+				text: c.options.title
+			},
+			exporting: {
+				enabled: false
+			},
+			credits: {
+				enabled: false
+			},
+			tooltip: {
+				pointFormat: 'Count: <b>{point.y}</b><br/>Percent: <b>{point.percentage:.1f}%</b>'
+			},
+			plotOptions: {
+				pie: {
+					allowPointSelect: true,
+					cursor: 'pointer',
+					dataLabels: {
+						enabled: true,
+						distance: -20,
+						format: '<b>{point.y}</b>',
+						style: {
+							color: 'black'
+						}
+					},
+					showInLegend: true
+				}
+			},
+			series: [{
+				name: 'Status',
+				colors: ['#800000', '#E3A6A6', '#F5CA0A', '#e1e1e1'],
+				data: c.data.chartData
+			}]
+		});	
+	}
+
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css>h1 {&#13;
+  color: #800000;&#13;
+}&#13;
+h3 {&#13;
+  color: #000080;&#13;
+}&#13;
+&#13;
+td, th {&#13;
+  padding:3px;&#13;
+}&#13;
+&#13;
+.countIndicate {&#13;
+    margin: 3px;&#13;
+  	background-color: #FFFFFF;&#13;
+	  border-style: solid;&#13;
+    border-width: 3px;&#13;
+    border-color: #dddddd;&#13;
+}</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>true</has_preview>
+        <id>tn-pie-priority</id>
+        <internal>false</internal>
+        <link/>
+        <name>TN Pie Priority</name>
+        <option_schema>[{"hint":"Title of the chart","name":"title","default_value":"Open Incidents by Priority","label":"Title","type":"string"},{"hint":"Page-unique ID for the containing div","name":"mydivid","default_value":"myChartPri123","label":"DivID","type":"string"}]</option_schema>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+  /* populate the 'data' object */
+  /* e.g., data.table = $sp.getValue('table'); */
+	
+	//Company Name
+	// var ourUser = gs.getUser();
+	// var coid = ourUser.getCompanyID();
+	// var co = new GlideRecord('core_company');
+	// co.get(coid);
+	// data.coName = ""+co.name;
+	
+	data.count = 0;
+	data.chartdiv = data.chardiv = '<div id="'+options.mydivid+'" style="height:280px;" ></div>';
+	
+	var gra = new GlideAggregate('incident');
+	gra.addEncodedQuery('stateNOT IN3,6,7');
+	gra.addEncodedQuery('active=true^sys_created_onONToday@javascript:gs.daysAgoStart(0)@javascript:gs.daysAgoEnd(0)');
+	
+	// Filter to specific "Agency"
+	// if (data.coName.includes("Virginia")) {
+	//   gra.addEncodedQuery('caller_id.company='+coid);
+	// }
+
+	gra.groupBy('priority');
+	gra.addAggregate('COUNT');
+	gra.query();
+	
+	data.p1 = 0;
+	data.p2 = 0;
+	data.p3 = 0;
+	data.p4 = 0;
+	
+	while(gra.next()) {
+		if (gra.priority == '1') {
+			data.p1 = 1 * gra.getAggregate('COUNT');
+		} else if (gra.priority == '2') {
+			data.p2 = 1 * gra.getAggregate('COUNT');
+		} else if (gra.priority == '3') {
+			data.p3 = 1 * gra.getAggregate('COUNT');
+		} else {
+			data.p4 = 1 * gra.getAggregate('COUNT');
+		}
+	}
+	
+	data.chartData = [
+		{
+			name: 'P1',
+			y: data.p1
+		},
+		{
+			name: 'P2',
+			y: data.p2
+		},
+		{
+			name: 'P3',
+			y: data.p3
+		},
+		{
+			name: 'P4/5',
+			y: data.p4
+		}
+	];
+
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-08-02 12:57:55</sys_created_on>
+        <sys_id>b399cc16db90c3007349ff041d96198d</sys_id>
+        <sys_mod_count>12</sys_mod_count>
+        <sys_name>TN Pie Priority</sys_name>
+        <sys_package display_value="TechNet17" source="x_snc_technet17">0c5da3a8db5803007349ff041d96194e</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="TechNet17">0c5da3a8db5803007349ff041d96194e</sys_scope>
+        <sys_update_name>sp_widget_b399cc16db90c3007349ff041d96198d</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2017-08-02 18:17:07</sys_updated_on>
+        <template><![CDATA[<div class='countIndicate' style="text-align:center;">
+  <div id="myChartPri123" style="height:280px;" ></div>
+</div>]]></template>
+    </sp_widget>
+</record_update>

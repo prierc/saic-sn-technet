@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_ui_view">
+    <sys_ui_view action="INSERT_OR_UPDATE">
+        <group/>
+        <hidden>false</hidden>
+        <name>closure</name>
+        <roles/>
+        <sys_class_name>sys_ui_view</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-07-30 16:52:04</sys_created_on>
+        <sys_id>a0722d1ddb5843007349ff041d9619a5</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Closure</sys_name>
+        <sys_package display_value="TechNet17" source="x_snc_technet17">0c5da3a8db5803007349ff041d96194e</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="TechNet17">0c5da3a8db5803007349ff041d96194e</sys_scope>
+        <sys_update_name>sys_ui_view_a0722d1ddb5843007349ff041d9619a5</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2017-07-30 16:52:04</sys_updated_on>
+        <title>Closure</title>
+        <user/>
+    </sys_ui_view>
+</record_update>

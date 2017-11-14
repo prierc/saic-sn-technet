@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sp_dependency">
+    <sp_dependency action="INSERT_OR_UPDATE">
+        <module>HighCharts</module>
+        <name>Highcharts for SP</name>
+        <page_load>false</page_load>
+        <sp_portals/>
+        <sys_class_name>sp_dependency</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-08-02 12:08:58</sys_created_on>
+        <sys_id>315eb78edb50c3007349ff041d961979</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Highcharts for SP</sys_name>
+        <sys_package display_value="TechNet17" source="x_snc_technet17">0c5da3a8db5803007349ff041d96194e</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="TechNet17">0c5da3a8db5803007349ff041d96194e</sys_scope>
+        <sys_update_name>sp_dependency_315eb78edb50c3007349ff041d961979</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2017-08-02 12:08:58</sys_updated_on>
+    </sp_dependency>
+</record_update>

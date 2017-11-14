@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sp_instance_table">
+    <sp_instance_table action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <class_name/>
+        <color>default</color>
+        <css/>
+        <display_field/>
+        <field_list>sys_updated_on,priority,category,short_description,location,caller_id</field_list>
+        <filter table="incident">active=true^caller_id.company=31bea3d53790200044e0bfc8bcbe5dec^incident_stateNOT IN3,6,7,8^sys_created_onONToday@javascript:gs.daysAgoStart(0)@javascript:gs.daysAgoEnd(0)<item endquery="false" field="active" goto="false" newquery="false" operator="=" or="false" value="true"/>
+            <item display_table="core_company" display_value="US Army" endquery="false" field="caller_id.company" goto="false" newquery="false" operator="=" or="false" value="31bea3d53790200044e0bfc8bcbe5dec"/>
+            <item endquery="false" field="incident_state" goto="false" newquery="false" operator="NOT IN" or="false" value="3,6,7,8"/>
+            <item endquery="false" field="sys_created_on" goto="false" newquery="false" operator="ON" or="false" value="Today@javascript:gs.daysAgoStart(0)@javascript:gs.daysAgoEnd(0)"/>
+        </filter>
+        <glyph/>
+        <id/>
+        <maximum_entries>10</maximum_entries>
+        <order>0</order>
+        <order_by/>
+        <order_direction>asc</order_direction>
+        <roles/>
+        <short_description/>
+        <size>md</size>
+        <sp_column display_value="1">6476c19edb14c3007349ff041d9619e0</sp_column>
+        <sp_page/>
+        <sp_widget display_value="Data Table from Instance Definition">38058ff1cb11020000f8d856634c9c8c</sp_widget>
+        <sys_class_name>sp_instance_table</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-08-02 13:17:17</sys_created_on>
+        <sys_id>2f0ec41adb90c3007349ff041d9619a6</sys_id>
+        <sys_mod_count>10</sys_mod_count>
+        <sys_name>Active Incidents</sys_name>
+        <sys_package display_value="TechNet17" source="x_snc_technet17">0c5da3a8db5803007349ff041d96194e</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="TechNet17">0c5da3a8db5803007349ff041d96194e</sys_scope>
+        <sys_update_name>sp_instance_table_2f0ec41adb90c3007349ff041d9619a6</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2017-08-02 17:26:13</sys_updated_on>
+        <table>incident</table>
+        <title>Active Incidents</title>
+        <url/>
+        <widget_parameters/>
+    </sp_instance_table>
+    <sys_translated_text action="delete_multiple" query="documentkey=2f0ec41adb90c3007349ff041d9619a6"/>
+</record_update>

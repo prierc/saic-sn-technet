@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_snc_technet17.IncidentGen</api_name>
+        <client_callable>true</client_callable>
+        <description>Methods to generate and/or resolve incidents</description>
+        <name>IncidentGen</name>
+        <script><![CDATA[var IncidentGen = Class.create();
+IncidentGen.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
+	
+	initialize: function() {
+		this.locations = {
+			"Redstone" : "f2a266e4dbd403007349ff041d9619ce",
+			"Campbell" : "def2e6e4dbd403007349ff041d961927",
+			"Stewart"  : "12232ae4dbd403007349ff041d9619d0",
+			"Benning"  : "0c832ae4dbd403007349ff041d9619d7",
+			"Gordon"   : "6df3e6e4dbd403007349ff041d96192e",
+			"Carson"   : "a7b52a28dbd403007349ff041d9619ab",
+			"JBLM"     : "72646228dbd403007349ff041d96194e",
+			"JBSA"     : "59256ee4dbd403007349ff041d9619a5",
+			"Bragg"    : "99c46ee4dbd403007349ff041d961999",
+			"Riley"    : "3ae5aa28dbd403007349ff041d9619af",
+			"Hood"     : "3d142ee4dbd403007349ff041d9619fd",
+			"Drum"     : "d555a628dbd403007349ff041d9619c0",
+			"Eustis"   : "bf852a28dbd403007349ff041d9619a3",
+		};
+		
+		this.asGroups = [
+			{"Name" : "Network",  "ID"  : "287ebd7da9fe198100f92cc8d1d2154e"},
+			{"Name" : "Hardware", "ID"  : "8a5055c9c61122780043563ef53438e3"},
+			{"Name" : "Software", "ID"  : "8a4dde73c6112278017a6a4baf547aa7"},			
+			{"Name" : "Inquiry",  "ID"  : "d625dccec0a8016700a222a0f7900d06"},  // Assign to Service Desk
+			{"Name" : "Database", "ID"  : "287ee6fea9fe198100ada7950d0b1b73"},	
+			{"Name" : "cybersec", "ID"  : "c1409aeadbdcc3007349ff041d96194a"},	
+		];
+
+		this.incCats = [
+			{"Name" : "Network",  "ID"  : "ef4225a40a0a0b5700d0b8a790747812"},
+			{"Name" : "Hardware", "ID"  : "ef43c6d40a0a0b5700c77f9bf387afe3"},
+			{"Name" : "Software", "ID"  : "d71da88ac0a801670061eabfe4b28f77"},
+			{"Name" : "Inquiry",  "ID"  : "fd88b855db1843007349ff041d961922"},
+			{"Name" : "Database", "ID"  : "8d6353eac0a8016400d8a125ca14fc1f"},
+			{"Name" : "cybersec", "ID"  : "d2f7cae4c611227a018ddc481b34e099"}
+		];
+		
+		this.incDescs = [
+			{"Name" : "Network",  "SD"  : "I'm having a problem getting to the Internet."},
+			{"Name" : "Hardware", "SD"  : "My laptop will not turn on."},
+			{"Name" : "Software", "SD"  : "The MTRS system is returning an odd error message."},
+			{"Name" : "Inquiry",  "SD"  : "Is there a change scheduled for my location this week?"},
+			{"Name" : "Database", "SD"  : "Seems like the AR552 database instance didn't sync last night."},
+			{"Name" : "cybersec", "SD"  : "Detected host with unidentified malware."}
+		];
+		
+		this.catNames = ["Network", "Hardware", "Software", "Inquiry", "Database", "cybersec"];		
+
+		this.locNames = ["Redstone", "Campbell", "Stewart", "Benning", 
+						 "Gordon", "Carson", "JBLM", "JBSA", "Bragg", 
+						 "Riley", "Hood", "Drum", "Eustis"];
+		
+	},
+	
+	genIncidentsX: function(locName, category, howMany) {
+		var x;
+		var rez = [];
+		for (x = 0; x < howMany; x++) {
+			rez.push(this.createUserIncident(locName, category));
+		}
+		return rez;
+	},
+	
+	genServiceOutage: function(create) {
+		this.createUserIncident('ANY', 'Software');
+		
+		var outRec;
+		var gr = new GlideRecord('cmdb_ci_outage');
+		gr.type = "Outage";
+		gr.cmdb_ci = "451047c6c0a8016400de0ae6df9b9d76";
+		gr.begin = new GlideDateTime();
+		gr.message = "The backend database for MTRS is offline.  Working on RTO.";
+		outRec = gr.update();
+		return outRec;		
+	},
+	
+	createUserIncident: function(locName, category) {
+		var au = new global.ArrayUtil();
+
+		var locIdx = 0;
+		var catIdx = 0;
+		
+		if (!locName || locName == "ANY") {
+			locIdx = Math.floor(Math.random() * this.locNames.length);
+			locName = this.locNames[locIdx];
+		} else {
+			locIdx = au.indexOf(this.locNames, locName);
+		}
+		
+		if (!category || category == "ANY") {
+			catIdx = Math.floor(Math.random() * this.catNames.length);
+			category = this.incCats[catIdx].Name;
+		} else {
+			catIdx = au.indexOf(this.catNames, category);
+		}
+		
+		var myUsers = this.getUsersForLocation(locName);
+		var randUser = myUsers[Math.floor(Math.random() * myUsers.length)].sysID;
+		
+		var myCIs, randCI;
+		if (catIdx < 2) {		
+			myCIs = this.getConfigItemsForLocation(locName);
+			randCI = myCIs[Math.floor(Math.random() * myCIs.length)].sysID;
+		} else if (catIdx == 2) {
+			randCI = "451047c6c0a8016400de0ae6df9b9d76";
+		}
+		
+		var gr = new GlideRecord('incident');
+		gr.short_description = this.incDescs[catIdx]["SD"];
+		gr.impact = Math.floor((Math.random() * 3) + 1);
+		gr.urgency = Math.floor((Math.random() * 3) + 1);
+		gr.caller_id = randUser;
+		gr.assignment_group = this.asGroups[catIdx].ID;
+		gr.category = this.incCats[catIdx]["Name"];
+		gr.location = this.locations[locName];
+		gr.close_code = "Solved (Permanently)";
+		gr.close_notes = "This example incident is resolved.";
+		
+		if (randCI) {
+			gr.cmdb_ci = randCI;
+		}
+				
+		return gr.update();
+	},
+
+	getConfigItemsForLocation: function(locName) {
+		var gr = new GlideRecord('cmdb_ci');
+		gr.addQuery('company.name', 'US Army');
+		gr.addQuery('location', this.locations[locName]);
+		gr.query();
+		
+		var rez = [];
+		while (gr.next()) {
+			rez.push({
+				"Name" : gr.getDisplayValue('name'),
+				"sysID" : gr.getValue('sys_id')
+			});
+		}
+		return rez;
+	},
+
+	
+	getUsersForLocation: function(locName) {
+		var gr = new GlideRecord('sys_user');
+		gr.addQuery('company.name', 'US Army');
+		gr.addQuery('location', this.locations[locName]);
+		gr.query();
+		
+		var rez = [];
+		while (gr.next()) {
+			rez.push({
+				"Name" : gr.getDisplayValue('name'),
+				"sysID" : gr.getValue('sys_id')
+			});
+		}
+		return rez;
+	},
+	
+
+    type: 'IncidentGen'
+});]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admindavid</sys_created_by>
+        <sys_created_on>2017-07-28 19:05:04</sys_created_on>
+        <sys_id>457d6fe8db5803007349ff041d961983</sys_id>
+        <sys_mod_count>48</sys_mod_count>
+        <sys_name>IncidentGen</sys_name>
+        <sys_package display_value="TechNet17" source="x_snc_technet17">0c5da3a8db5803007349ff041d96194e</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="TechNet17">0c5da3a8db5803007349ff041d96194e</sys_scope>
+        <sys_update_name>sys_script_include_457d6fe8db5803007349ff041d961983</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2017-08-07 16:48:21</sys_updated_on>
+    </sys_script_include>
+</record_update>
